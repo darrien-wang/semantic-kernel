@@ -16,13 +16,13 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
     const [isBusy, setIsBusy] = useState<boolean>(false);
     const sk = useSemanticKernel(process.env.REACT_APP_FUNCTION_URI as string);
 
-    const [openAiKey, setOpenAiKey] = useState<string>(process.env.REACT_APP_OPEN_AI_KEY as string);
-    const [openAiModel, setOpenAiModel] = useState<string>(process.env.REACT_APP_OPEN_AI_MODEL as string);
-    const [azureOpenAiKey, setAzureOpenAiKey] = useState<string>(process.env.REACT_APP_AZURE_OPEN_AI_KEY as string);
-    const [azureOpenAiDeployment, setAzureOpenAiDeployment] = useState<string>(
+    const [OpenAIKey, setOpenAIKey] = useState<string>(process.env.REACT_APP_OPEN_AI_KEY as string);
+    const [OpenAIModel, setOpenAIModel] = useState<string>(process.env.REACT_APP_OPEN_AI_MODEL as string);
+    const [azureOpenAIKey, setAzureOpenAIKey] = useState<string>(process.env.REACT_APP_AZURE_OPEN_AI_KEY as string);
+    const [azureOpenAIDeployment, setAzureOpenAIDeployment] = useState<string>(
         process.env.REACT_APP_AZURE_OPEN_AI_DEPLOYMENT as string,
     );
-    const [azureOpenAiEndpoint, setAzureOpenAiEndpoint] = useState<string>(
+    const [azureOpenAIEndpoint, setAzureOpenAIEndpoint] = useState<string>(
         process.env.REACT_APP_AZURE_OPEN_AI_ENDPOINT as string,
     );
 
@@ -34,7 +34,7 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
 
         try {
             var result = await sk.invokeAsync(keyConfig, ask, 'funskill', 'joke');
-            console.log(result);
+            console.log('result', result);
             onConfigComplete(keyConfig);
         } catch (e) {
             alert('Something went wrong.\n\nDetails:\n' + e);
@@ -44,16 +44,17 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
     };
 
     useEffect(() => {
-        keyConfig.completionConfig = {
-            key: isOpenAI ? openAiKey : azureOpenAiKey,
-            deploymentOrModelId: isOpenAI ? openAiModel : azureOpenAiDeployment,
-            label: isOpenAI ? openAiModel : azureOpenAiDeployment,
-            endpoint: isOpenAI ? '' : azureOpenAiEndpoint,
-            backend: isOpenAI ? 1 : 0,
-        };
-
-        setKeyConfig((keyConfig) => ({ ...keyConfig }));
-    }, [isOpenAI, openAiKey, openAiModel, azureOpenAiKey, azureOpenAiDeployment, azureOpenAiEndpoint, keyConfig]);
+        setKeyConfig((prevState) => ({
+            ...prevState,
+            completionConfig: {
+                key: isOpenAI ? OpenAIKey : azureOpenAIKey,
+                deploymentOrModelId: isOpenAI ? OpenAIModel : azureOpenAIDeployment,
+                label: isOpenAI ? OpenAIModel : azureOpenAIDeployment,
+                endpoint: isOpenAI ? '' : azureOpenAIEndpoint,
+                backend: isOpenAI ? 1 : 0,
+            },
+        }));
+    }, [isOpenAI, OpenAIKey, OpenAIModel, azureOpenAIKey, azureOpenAIDeployment, azureOpenAIEndpoint]);
 
     return (
         <>
@@ -80,9 +81,9 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
                     <Input
                         id="openaikey"
                         type="password"
-                        value={openAiKey}
+                        value={OpenAIKey}
                         onChange={(e, d) => {
-                            setOpenAiKey(d.value);
+                            setOpenAIKey(d.value);
                             setKeyConfig({
                                 ...keyConfig,
                                 completionConfig: { ...keyConfig.completionConfig, key: d.value },
@@ -93,9 +94,9 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
                     <Label htmlFor="oaimodel">Model</Label>
                     <Input
                         id="oaimodel"
-                        value={openAiModel}
+                        value={OpenAIModel}
                         onChange={(e, d) => {
-                            setOpenAiModel(d.value);
+                            setOpenAIModel(d.value);
                             setKeyConfig({
                                 ...keyConfig,
                                 completionConfig: {
@@ -114,9 +115,9 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
                     <Input
                         id="azureopenaikey"
                         type="password"
-                        value={azureOpenAiKey}
+                        value={azureOpenAIKey}
                         onChange={(e, d) => {
-                            setAzureOpenAiKey(d.value);
+                            setAzureOpenAIKey(d.value);
                             setKeyConfig({
                                 ...keyConfig,
                                 completionConfig: { ...keyConfig.completionConfig, key: d.value },
@@ -127,9 +128,9 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
                     <Label htmlFor="oaimodel">Model</Label>
                     <Input
                         id="aoaideployment"
-                        value={azureOpenAiDeployment}
+                        value={azureOpenAIDeployment}
                         onChange={(e, d) => {
-                            setAzureOpenAiDeployment(d.value);
+                            setAzureOpenAIDeployment(d.value);
                             setKeyConfig({
                                 ...keyConfig,
                                 completionConfig: {
@@ -144,9 +145,9 @@ const ServiceConfig: FC<IData> = ({ uri, onConfigComplete }) => {
                     <Label htmlFor="oaiendpoint">Endpoint</Label>
                     <Input
                         id="aoaiendpoint"
-                        value={azureOpenAiEndpoint}
+                        value={azureOpenAIEndpoint}
                         onChange={(e, d) => {
-                            setAzureOpenAiEndpoint(d.value);
+                            setAzureOpenAIEndpoint(d.value);
                             setKeyConfig({
                                 ...keyConfig,
                                 completionConfig: { ...keyConfig.completionConfig, endpoint: d.value },
